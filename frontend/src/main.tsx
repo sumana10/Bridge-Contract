@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
+import App from './_App.tsx'
 
 import { Web3Provider } from './components/Web3Provider';
 
