@@ -14,27 +14,26 @@ const menuItems = [
 
 const Sidebar = ({ onClose }) => {
   return (
-    <div className="h-full overflow-y-auto bg-custom-gradient p-4 border-r border-gray-200">
+    <div className="h-full overflow-y-auto bg-custom-gradient p-5 border-r border-gray-200">
       <div className="flex items-center justify-between mb-6">
-        <button 
-          className="p-1.5 rounded-md text-gray-700 md:hidden" 
+        <button
+          className="p-2 rounded-md text-gray-700 md:hidden"
           onClick={onClose}
           aria-label="Close menu"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
       </div>
-      
-      <nav>
+
+      <nav className="space-y-2">
         {menuItems.map((item, index) => (
           <div
             key={index}
-            className={`flex items-center gap-3 px-3 md:px-4 py-2 rounded-lg mb-1 cursor-pointer ${
-              item.active ? 'bg-purple-50 text-purple-600' : 'text-gray-700 hover:bg-gray-50'
-            }`}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg cursor-pointer ${item.active ? 'bg-purple-50 text-gray-700' : 'text-gray-700 hover:bg-gray-50'
+              }`}
           >
-            <item.icon size={18} className="flex-shrink-0" />
-            <span className="text-sm md:text-base">{item.text}</span>
+            <item.icon size={20} className="flex-shrink-0" />
+            <span className="text-sm">{item.text}</span>
           </div>
         ))}
       </nav>
