@@ -28,7 +28,7 @@ const Header = ({ onMenuToggle }) => {
   ];
 
   return (
-    <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-[#d6a4a4] sticky top-0 z-40 h-16">
+    <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-custom-gradient sticky top-0 z-40 h-16">
       <div className="flex items-center">
         <button
           className="mr-3 p-2 rounded-md text-gray-600 md:hidden"

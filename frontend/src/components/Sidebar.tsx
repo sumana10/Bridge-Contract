@@ -12,7 +12,7 @@ const menuItems = [
   { icon: FileCode, text: 'Documentation', active: false },
 ];
 
-const Sidebar = ({ onClose }) => {
+const Sidebar = ({ onClose } : any) => {
   return (
     <div className="h-full overflow-y-auto bg-custom-gradient p-5 border-r border-gray-200">
       <div className="flex items-center justify-between mb-6">
