@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
-import { BRIDGE_ABI, BRIDGE_ABI_NEW } from './utils/constants';
+import { BRIDGE_ABI, BRIDGE_ABI_AMOY } from './utils/constants';
 
 interface AdminPanelProps {
   bridgeAddress: string;
@@ -19,17 +19,21 @@ export function AdminPanel({ bridgeAddress }: AdminPanelProps) {
   const { address, chainId } = useAccount();
   const { writeContractAsync } = useWriteContract();
   
+  // Determine which ABI to use based on the chain
+  const isAmoy = chainId === 80002; // Amoy testnet chain ID
+  const abi = isAmoy ? BRIDGE_ABI_AMOY : BRIDGE_ABI;
+  
   // Transaction receipt tracking
   const { data: txReceipt, isLoading: isWaiting, isSuccess: isConfirmed } = 
-    useWaitForTransactionReceipt({ 
-      hash: txHash as `0x${string}`, 
-      enabled: !!txHash 
+    useWaitForTransactionReceipt({
+      hash: txHash as `0x${string}`,
+      enabled: !!txHash
     });
   
   // Check if token is whitelisted
   const { data: isWhitelisted, refetch: refetchWhitelist } = useReadContract({
     address: bridgeAddress,
-    abi: BRIDGE_ABI_NEW,
+    abi: abi,
     functionName: 'whitelistedTokens',
     args: [tokenAddress],
     query: {
@@ -40,7 +44,7 @@ export function AdminPanel({ bridgeAddress }: AdminPanelProps) {
   // Get minimum amount
   const { data: currentMinAmount, refetch: refetchMinAmount } = useReadContract({
     address: bridgeAddress,
-    abi: BRIDGE_ABI_NEW,
+    abi: abi,
     functionName: 'minAmounts',
     args: [tokenAddress],
     query: {
@@ -51,7 +55,7 @@ export function AdminPanel({ bridgeAddress }: AdminPanelProps) {
   // Get maximum amount
   const { data: currentMaxAmount, refetch: refetchMaxAmount } = useReadContract({
     address: bridgeAddress,
-    abi: BRIDGE_ABI_NEW,
+    abi: abi,
     functionName: 'maxAmounts',
     args: [tokenAddress],
     query: {
@@ -93,7 +97,7 @@ export function AdminPanel({ bridgeAddress }: AdminPanelProps) {
       
       const hash = await writeContractAsync({
         address: bridgeAddress,
-        abi: BRIDGE_ABI_NEW,
+        abi: abi,
         functionName: 'setTokenWhitelist',
         args: [tokenAddress, status],
       });
@@ -128,7 +132,7 @@ export function AdminPanel({ bridgeAddress }: AdminPanelProps) {
       
       const hash = await writeContractAsync({
         address: bridgeAddress,
-        abi: BRIDGE_ABI_NEW,
+        abi: abi,
         functionName: 'setMinAmount',
         args: [tokenAddress, minAmountBigInt],
       });
@@ -161,7 +165,7 @@ export function AdminPanel({ bridgeAddress }: AdminPanelProps) {
       
       const hash = await writeContractAsync({
         address: bridgeAddress,
-        abi: BRIDGE_ABI_NEW,
+        abi: abi,
         functionName: 'setMaxAmount',
         args: [tokenAddress, maxAmountBigInt],
       });
@@ -192,9 +196,19 @@ export function AdminPanel({ bridgeAddress }: AdminPanelProps) {
     setMaxAmount('1000');
   };
 
+  // Get the appropriate explorer URL based on the chain
+  const getExplorerUrl = () => {
+    if (chainId === 97) return 'https://testnet.bscscan.com/tx/';
+    if (chainId === 80002) return 'https://www.oklink.com/amoy/tx/';
+    return 'https://etherscan.io/tx/'; // Default fallback
+  };
+
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md space-y-6">
       <h2 className="text-xl font-bold text-center text-gray-800">Bridge Admin Panel</h2>
+      <div className="text-sm text-center text-gray-600">
+        Using {isAmoy ? 'Amoy' : 'Standard'} Bridge Contract
+      </div>
       
       {/* Quick setup buttons */}
       <div className="flex gap-2">
@@ -304,7 +318,7 @@ export function AdminPanel({ bridgeAddress }: AdminPanelProps) {
         <div className="p-3 bg-gray-50 rounded-lg text-sm">
           <p className="font-medium">Transaction {isWaiting ? 'Processing' : 'Confirmed'}:</p>
           <a 
-            href={`${chainId === 97 ? 'https://testnet.bscscan.com/tx/' : 'https://www.oklink.com/amoy/tx/'}${txHash}`}
+            href={`${getExplorerUrl()}${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 break-all hover:underline"

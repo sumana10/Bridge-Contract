@@ -884,7 +884,7 @@ export const BRIDGE_ABI = [
     }
 ]
 
-export const TOKEN_ABI_NEW = [
+export const TOKEN_ABI_AMOY = [
 	{
 		"inputs": [
 			{
@@ -1354,7 +1354,7 @@ export const TOKEN_ABI_NEW = [
 	}
 ]
 
-export const BRIDGE_ABI_NEW = [
+export const BRIDGE_ABI_AMOY = [
 	{
 		"inputs": [
 			{
