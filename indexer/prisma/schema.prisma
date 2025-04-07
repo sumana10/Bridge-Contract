@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum NETWORK {
+  BNB
+  Amoy
+}
+
+model TransactionData {
+  id           Int      @id @default(autoincrement())
+  txHash       String   @unique
+  isDone       Boolean  @default(false)
+  tokenAddress String
+  amount       String
+  sender       String
+  network      String
+  nonce        Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model NetworkStatus {
+  id                 Int      @id @default(autoincrement())
+  network            NETWORK  @unique
+  lastProcessedBlock Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Nonce {
+  id      Int     @id @default(autoincrement())
+  nonce   Int     @default(0)
+  network NETWORK @unique
+}
