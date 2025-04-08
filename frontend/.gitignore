@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 .env
-/src/App.tsx
-/src/App1331.tsx
+/src/sumtext/
+

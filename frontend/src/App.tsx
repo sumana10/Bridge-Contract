@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import Sidebar from './components/Sidebar';
-import Header from './components/Header';
-import BridgeForm from './components/BridgeForm';
-import TransactionsList from './components/TransactionsList';
+import { Sidebar, Header, BridgeForm, TransactionsList } from './components'
 
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

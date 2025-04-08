@@ -1,9 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, MoreHorizontal, Menu } from 'lucide-react';
+import { ConnectKitButton } from 'connectkit';
+import { useAccount, useChainId } from 'wagmi';
+import { switchNetwork } from 'wagmi/actions';
 
 const Header = ({ onMenuToggle }) => {
   const [networkDropdownOpen, setNetworkDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const { isConnected } = useAccount();
+  const chainId = useChainId();
+
+  const getCurrentNetworkInfo = () => {
+    if (!chainId) return networks[0]; // Default to first network
+
+    if (chainId === 97) {
+      return networks[1]; // BNB Testnet
+    } else if (chainId === 80002) {
+      return networks[0]; // Polygon Amoy
+    }
+
+    return {
+      id: chainId.toString(),
+      name: `Chain ID: ${chainId}`,
+      shortName: `Chain ${chainId}`,
+      icon: './poly.png' // Default icon
+    };
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -22,10 +45,51 @@ const Header = ({ onMenuToggle }) => {
     setNetworkDropdownOpen(!networkDropdownOpen);
   };
 
+  const handleSwitchNetwork = (newChainId) => {
+    try {
+      switchNetwork({ chainId: newChainId });
+      setNetworkDropdownOpen(false);
+    } catch (error) {
+      console.error("Failed to switch network:", error);
+    }
+  };
+
   const networks = [
-    { id: 'amoy', name: 'Polygon Amoy', shortName: 'Amoy', icon: './poly.png' },
-    { id: 'bnb', name: 'Binance Testnet', shortName: 'BNB', icon: './bnb.png' }
+    { id: 'amoy', name: 'Polygon Amoy', shortName: 'Amoy', icon: './poly.png', chainId: 80002 },
+    { id: 'bnb', name: 'Binance Testnet', shortName: 'BNB', icon: './bnb.png', chainId: 97 }
   ];
+
+  const currentNetwork = getCurrentNetworkInfo();
+
+  const CustomConnectButton = () => {
+    return (
+      <ConnectKitButton.Custom>
+        {({ isConnected, show, truncatedAddress, ensName }) => {
+          return (
+            <button
+              onClick={show}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${isConnected
+                  ? 'hover:bg-gray-50'
+                  : 'bg-[#d6a4a4] hover:bg-[#c99393] font-medium'
+                }`}
+            >
+              {isConnected ? (
+                <>
+                  <img src="./bnb.png" alt="Wallet" className="w-6 h-6" />
+                  <span className="hidden xs:inline">{ensName || truncatedAddress}</span>
+                  <ChevronDown size={18} className="hidden xs:block" />
+                </>
+              ) : (
+                <>
+                  <span>Connect Wallet</span>
+                </>
+              )}
+            </button>
+          );
+        }}
+      </ConnectKitButton.Custom>
+    );
+  };
 
   return (
     <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-custom-gradient sticky top-0 z-40 h-16">
@@ -37,7 +101,6 @@ const Header = ({ onMenuToggle }) => {
         >
           <Menu size={22} />
         </button>
-
         <div className="flex items-center gap-3">
           <div>
             <span className="font-semibold text-base">Moonrise</span>
@@ -45,7 +108,6 @@ const Header = ({ onMenuToggle }) => {
           </div>
         </div>
       </div>
-
       <div className="flex items-center gap-3 md:gap-4">
         <div className="relative" ref={dropdownRef}>
           <button
@@ -54,23 +116,22 @@ const Header = ({ onMenuToggle }) => {
             aria-expanded={networkDropdownOpen}
             aria-haspopup="true"
           >
-            <img src="./poly.png" alt="Network" className="w-6 h-6" />
-            <span className="hidden sm:inline">Polygon Amoy</span>
-            <span className="inline sm:hidden">zkEVM</span>
+            <img src={currentNetwork.icon} alt="Network" className="w-6 h-6" />
+            <span className="hidden sm:inline">{currentNetwork.name}</span>
+            <span className="inline sm:hidden">{currentNetwork.shortName}</span>
             <ChevronDown size={18} className={networkDropdownOpen ? "transform rotate-180 transition-transform" : "transition-transform"} />
           </button>
-
           {networkDropdownOpen && (
             <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
               {networks.map((network) => (
                 <button
                   key={network.id}
                   className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-gray-50"
-                  onClick={() => setNetworkDropdownOpen(false)}
+                  onClick={() => handleSwitchNetwork(network.chainId)}
                 >
                   <img src={network.icon} alt={network.name} className="w-5 h-5" />
                   <span>{network.name}</span>
-                  {network.id === 'zkevm' && (
+                  {currentNetwork.id === network.id && (
                     <span className="ml-auto text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">
                       Active
                     </span>
@@ -85,11 +146,7 @@ const Header = ({ onMenuToggle }) => {
           )}
         </div>
 
-        <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm">
-          <img src="./bnb.png" alt="Wallet" className="w-6 h-6" />
-          <span className="hidden xs:inline sm:inline">0x93...b5fa</span>
-          <ChevronDown size={18} className="hidden xs:block" />
-        </button>
+        <CustomConnectButton />
 
         <button className="p-2 hover:bg-gray-50 rounded-lg">
           <MoreHorizontal size={22} />
