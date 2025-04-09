@@ -13,6 +13,7 @@ const TransactionsList = () => {
     setIsLoading(true);
     try {
       const txs = getTransactions(address);
+
       const updatedTxs = await Promise.all(
         txs.map(async (tx) => {
           if (tx.status === 'pending' && tx.hash && publicClient) {
@@ -46,7 +47,9 @@ const TransactionsList = () => {
       );
 
       updatedTxs.sort((a, b) => b.timestamp - a.timestamp);
-      setTransactions(updatedTxs);
+      const recentTxs = updatedTxs.slice(0, 5);
+
+      setTransactions(recentTxs);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     } finally {
@@ -57,7 +60,7 @@ const TransactionsList = () => {
   useEffect(() => {
     fetchTransactions();
 
-    const intervalId = setInterval(fetchTransactions, 15000); // every 15 seconds
+    const intervalId = setInterval(fetchTransactions, 15000); 
 
     return () => clearInterval(intervalId);
   }, [address, isConnected, publicClient]);
@@ -117,7 +120,7 @@ const TransactionsList = () => {
       ) : transactions.length > 0 ? (
         <div className="space-y-3">
           {transactions.map((tx) => (
-            <div key={tx.hash} className="bg-white rounded-lg p-3 shadow-sm">
+            <div key={tx.hash} className="bg-[#dae2f8] rounded-lg p-3 shadow-sm">
               <div className="flex justify-between items-start">
                 <div>
                   <div className="flex items-center gap-2">

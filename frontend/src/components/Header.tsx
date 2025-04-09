@@ -12,7 +12,7 @@ const Header = ({ onMenuToggle }) => {
   const chainId = useChainId();
 
   const getCurrentNetworkInfo = () => {
-    if (!chainId) return networks[0]; // Default to first network
+    if (!chainId) return networks[0]; 
 
     if (chainId === 97) {
       return networks[1]; // BNB Testnet
@@ -24,7 +24,7 @@ const Header = ({ onMenuToggle }) => {
       id: chainId.toString(),
       name: `Chain ID: ${chainId}`,
       shortName: `Chain ${chainId}`,
-      icon: './poly.png' // Default icon
+      icon: './poly.png' 
     };
   };
 
@@ -75,7 +75,7 @@ const Header = ({ onMenuToggle }) => {
             >
               {isConnected ? (
                 <>
-                  <img src="./bnb.png" alt="Wallet" className="w-6 h-6" />
+                  <img src={currentNetwork.icon} alt="Wallet" className="w-6 h-6" />
                   <span className="hidden xs:inline">{ensName || truncatedAddress}</span>
                   <ChevronDown size={18} className="hidden xs:block" />
                 </>

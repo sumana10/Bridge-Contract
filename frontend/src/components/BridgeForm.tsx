@@ -5,16 +5,19 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { parseUnits, formatUnits } from 'viem';
 import { BNB_BRIDGE, BNB_TOKEN, BRIDGE_ABI, BRIDGE_ABI_AMOY, AMOY_BRIDGE, AMOY_TOKEN, TOKEN_ABI, TOKEN_ABI_AMOY } from "../utils/constants";
 
+
 interface TokenBalance {
   balance: string;
   symbol: string;
 }
+
 
 const BridgeForm = () => {
   const [amount, setAmount] = useState<string>('0.1');
   const [equivalentAmount, setEquivalentAmount] = useState<string>('0.1');
   const [fromToken, setFromToken] = useState<TokenBalance>({ balance: '0.218649', symbol: 'ETH' });
   const [toToken, setToToken] = useState<TokenBalance>({ balance: '0', symbol: 'ETH' });
+
 
   const [fromNetwork, setFromNetwork] = useState('Amoy');
   const [toNetwork, setToNetwork] = useState('BNB');
@@ -25,11 +28,13 @@ const BridgeForm = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+
   const { isConnected, chainId, address } = useAccount();
   const [tokenAddress, setTokenAddress] = useState(AMOY_TOKEN);
   const [spenderAddress, setSpenderAddress] = useState(AMOY_BRIDGE);
   const [currentTokenAbi, setCurrentTokenAbi] = useState(TOKEN_ABI_AMOY);
   const [currentBridgeAbi, setCurrentBridgeAbi] = useState(BRIDGE_ABI_AMOY);
+
 
   const { writeContractAsync } = useWriteContract();
   const { data: txReceipt, isLoading: isWaiting, isSuccess: isConfirmed } =
@@ -38,13 +43,16 @@ const BridgeForm = () => {
       enabled: !!txHash
     });
 
+
   useEffect(() => {
     setEquivalentAmount(amount);
   }, [amount]);
 
+
   useEffect(() => {
     if (!isConnected) return;
     console.log("Chain ID detected:", chainId);
+
 
     if (chainId === 97) {  // BNB Chain
       console.log("Setting up for BNB Chain");
@@ -77,11 +85,13 @@ const BridgeForm = () => {
       setFromToken({ balance: '0.218649', symbol: 'BNB' });
       setToToken({ balance: '0', symbol: 'POL' });
 
+
       if (chainId) {
         console.warn(`Network with chainId ${chainId} is not supported. Please switch to BNB Chain or Amoy Testnet.`);
       }
     }
   }, [chainId, isConnected]);
+
 
   const { data: isWhitelisted } = useReadContract({
     address: spenderAddress,
@@ -93,6 +103,7 @@ const BridgeForm = () => {
     }
   });
 
+
   const { data: minAmount } = useReadContract({
     address: spenderAddress,
     abi: currentBridgeAbi,
@@ -102,6 +113,7 @@ const BridgeForm = () => {
       enabled: isConnected && !!tokenAddress && !!spenderAddress,
     }
   });
+
 
   const { data: maxAmount } = useReadContract({
     address: spenderAddress,
@@ -113,6 +125,7 @@ const BridgeForm = () => {
     }
   });
 
+
   const { data: allowance, refetch, isError: allowanceError } = useReadContract({
     address: tokenAddress,
     abi: currentTokenAbi,
@@ -122,6 +135,7 @@ const BridgeForm = () => {
       enabled: isConnected && !!address && !!tokenAddress && !!spenderAddress,
     }
   });
+
 
   const { data: tokenBalance, refetch: refetchBalance } = useReadContract({
     address: tokenAddress,
@@ -133,6 +147,7 @@ const BridgeForm = () => {
     }
   });
 
+
   useEffect(() => {
     if (tokenBalance) {
       setFromToken(prev => ({
@@ -142,6 +157,7 @@ const BridgeForm = () => {
     }
   }, [tokenBalance]);
 
+
   useEffect(() => {
     if (!amount || !allowance) {
       setIsAllowanceSufficient(false);
@@ -150,7 +166,9 @@ const BridgeForm = () => {
     try {
       const amountBigInt = parseUnits(amount.toString(), 18);
 
+
       setIsAllowanceSufficient(allowance >= amountBigInt);
+
 
       console.log("Allowance check:", {
         allowance: formatUnits(allowance, 18),
@@ -163,8 +181,10 @@ const BridgeForm = () => {
     }
   }, [allowance, amount]);
 
+
   useEffect(() => {
     setWalletConnected(isConnected);
+
 
     if (isConnected) {
       console.log("Wallet connected:", address);
@@ -175,9 +195,11 @@ const BridgeForm = () => {
     }
   }, [isConnected, address]);
 
+
   useEffect(() => {
     if (isConfirmed && txReceipt) {
       console.log("Transaction confirmed:", txReceipt);
+
 
 
       if (txHash) {
@@ -189,12 +211,15 @@ const BridgeForm = () => {
         });
       }
 
+
       refetch();
       refetchBalance();
+
 
       if (txReceipt.status === 'success') {
         const actionType = isAllowanceSufficient ? 'Bridge' : 'Approval';
         setSuccessMessage(`${actionType} transaction successful! Your transaction has been confirmed.`);
+
 
         if (isAllowanceSufficient) {
           setAmount('');
@@ -202,15 +227,19 @@ const BridgeForm = () => {
         }
       }
 
+
       setIsLoading(false);
+
 
       const timer = setTimeout(() => {
         setSuccessMessage('');
       }, 10000);
 
+
       return () => clearTimeout(timer);
     }
   }, [isConfirmed, txReceipt, txHash, refetch, refetchBalance, isAllowanceSufficient]);
+
 
   const validateInputs = () => {
     if (!isConnected) {
@@ -218,20 +247,24 @@ const BridgeForm = () => {
       return false;
     }
 
+
     if (!amount || Number(amount) <= 0) {
       alert("Please enter a valid amount");
       return false;
     }
+
 
     if (!tokenAddress || !spenderAddress) {
       alert("Contract addresses not properly configured");
       return false;
     }
 
+
     if (isWhitelisted === false) {
       setErrorMessage(`Token ${tokenAddress} is not whitelisted for bridging`);
       return false;
     }
+
 
     if (minAmount) {
       const amountBigInt = parseUnits(amount.toString(), 18);
@@ -241,6 +274,7 @@ const BridgeForm = () => {
       }
     }
 
+
     if (maxAmount && maxAmount > 0n) {
       const amountBigInt = parseUnits(amount.toString(), 18);
       if (amountBigInt > maxAmount) {
@@ -249,21 +283,27 @@ const BridgeForm = () => {
       }
     }
 
+
     return true;
   };
 
+
   const approve = async () => {
     if (!validateInputs()) return;
+
 
     setIsLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
     setTxHash('');
 
+
     try {
       const approveAmount = parseUnits(amount.toString(), 18);
 
+
       console.log(`Approving ${amount} tokens from ${tokenAddress} to ${spenderAddress}`);
+
 
       const hash = await writeContractAsync({
         address: tokenAddress,
@@ -272,8 +312,10 @@ const BridgeForm = () => {
         args: [spenderAddress, approveAmount],
       });
 
+
       setTxHash(hash);
       console.log("Approval transaction submitted:", hash);
+
 
       addTransaction({
         hash: hash,
@@ -285,6 +327,7 @@ const BridgeForm = () => {
         userAddress: address
       });
 
+
     } catch (error) {
       console.error("Approval error:", error);
       setErrorMessage(error instanceof Error ? error.message : String(error));
@@ -292,21 +335,27 @@ const BridgeForm = () => {
     }
   };
 
+
   const handleSwap = async () => {
     if (!validateInputs() || !isAllowanceSufficient) return;
+
 
     setIsLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
     setTxHash('');
 
+
     try {
       const bridgeAmount = parseUnits(amount.toString(), 18);
+
 
       console.log(`Bridging ${amount} tokens from ${fromNetwork} to ${toNetwork}`);
       console.log(`Token: ${tokenAddress}, Bridge: ${spenderAddress}`);
 
+
       const gasLimit = chainId === 80002 ? BigInt(1000000) : BigInt(500000);
+
 
       const hash = await writeContractAsync({
         address: spenderAddress,
@@ -316,8 +365,10 @@ const BridgeForm = () => {
         gas: gasLimit
       });
 
+
       setTxHash(hash);
       console.log("Bridge transaction submitted:", hash);
+
 
       addTransaction({
         hash: hash,
@@ -331,10 +382,13 @@ const BridgeForm = () => {
         userAddress: address
       });
 
+
     } catch (error) {
       console.error("Bridge error:", error);
 
+
       const errorString = String(error);
+
 
       if (errorString.includes("Token_Not_Whitelisted")) {
         setErrorMessage("This token is not whitelisted for bridging");
@@ -349,21 +403,26 @@ const BridgeForm = () => {
         setErrorMessage(errorString);
       }
 
+
       setIsLoading(false);
     }
   };
 
-  const handlePercentage = (percentage: number) => {
-    if (!tokenBalance) return;
 
-    const calculatedAmount = (Number(formatUnits(tokenBalance, 18)) * percentage / 100).toString();
-    setAmount(calculatedAmount);
-  };
+  // const handlePercentage = (percentage: number) => {
+  //   if (!tokenBalance) return;
 
-  const handleMax = () => {
-    if (!tokenBalance) return;
-    setAmount(formatUnits(tokenBalance, 18));
-  };
+
+  //   const calculatedAmount = (Number(formatUnits(tokenBalance, 18)) * percentage / 100).toString();
+  //   setAmount(calculatedAmount);
+  // };
+
+
+  // const handleMax = () => {
+  //   if (!tokenBalance) return;
+  //   setAmount(formatUnits(tokenBalance, 18));
+  // };
+
 
   const handleClearForm = () => {
     setAmount('');
@@ -372,6 +431,8 @@ const BridgeForm = () => {
     setSuccessMessage('');
     setTxHash('');
   };
+
+  console.log(errorMessage);
 
   return (
     <div className="bg-[#d6a4a4] rounded-3xl shadow-sm border border-gray-200 p-5 md:p-6 w-full h-auto">
@@ -394,7 +455,6 @@ const BridgeForm = () => {
             <div className="flex gap-2 rounded-xl p-3 border border-gray-300 shadow-md hover:shadow-lg transition-shadow">
               <button className="w-24 flex items-center justify-between gap-1 px-3 py-2 bg-[#d6a4a4] rounded-lg border border-gray-200 text-sm">
                 <span className="font-medium">{fromToken.symbol}</span>
-                <ChevronDown size={16} />
               </button>
               <input
                 type="text"
@@ -404,6 +464,7 @@ const BridgeForm = () => {
                 placeholder="0.0"
               />
             </div>
+            {/* Remove Calculation Percentage From UI
             <div className="flex gap-2 mt-3">
               <button
                 onClick={() => handlePercentage(25)}
@@ -422,8 +483,8 @@ const BridgeForm = () => {
                 className="px-2 py-1 rounded-lg border border-gray-200 text-xs hover:bg-gray-100 transition-colors"
               >
                 MAX
-              </button>
-            </div>
+              </button> 
+            </div> */}
           </div>
         </div>
         <div className="flex justify-center my-2">
@@ -468,6 +529,7 @@ const BridgeForm = () => {
           </div>
         )}
 
+
         {isConnected && (
           <div className="p-3 bg-[#d6a4a4]/50 rounded-lg text-xs mb-4 border border-gray-300">
             <div className="flex flex-col gap-1">
@@ -499,6 +561,7 @@ const BridgeForm = () => {
           </div>
         )}
 
+
         <div className="flex-1 min-h-[15px]"></div>
         <div className="space-y-2 mb-4">
           <div className="flex items-center justify-between text-xs">
@@ -506,17 +569,18 @@ const BridgeForm = () => {
               Est. Gas Fees <HelpCircle size={14} className="text-gray-700" />
             </div>
             <div className="flex items-end gap-1">
-              <span>0.00690 {fromToken.symbol}</span>
-              <span className="text-gray-700 hidden sm:inline">~12.63 USD</span>
+              <span>0.0003 {fromToken.symbol}</span>
+              <span className="text-gray-700 hidden sm:inline">~1.66 USD</span>
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1">
               Est. Time <HelpCircle size={14} className="text-gray-700" />
             </div>
-            <span>15 mins</span>
+            <span>9 secs</span>
           </div>
         </div>
+
 
         {txHash && (
           <div className="mb-4 p-3 bg-[#d6a4a4]/50 rounded-lg text-xs border border-gray-300">
@@ -533,8 +597,8 @@ const BridgeForm = () => {
         )}
 
         {errorMessage && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-xs border border-red-200 flex items-start gap-2">
-            <div>
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-xs border border-red-200 flex items-start gap-2 max-w-full overflow-hidden">
+            <div className="overflow-x-auto break-words whitespace-pre-wrap max-w-[90%]">
               <p className="font-medium">Error:</p>
               <p>{errorMessage}</p>
             </div>
@@ -559,7 +623,9 @@ const BridgeForm = () => {
           <button
             onClick={approve}
             disabled={!walletConnected || isLoading || isWaiting || !amount}
-            className={`w-full bg-yellow-500 text-white py-3 rounded-xl font-medium transition-all text-sm shadow-md hover:shadow-lg ${(!amount || isLoading || isWaiting) ? 'opacity-70 cursor-not-allowed' : 'hover:bg-yellow-600'}`}
+            className={`w-full text-white py-3 rounded-xl font-medium transition-all text-sm shadow-md hover:shadow-lg ${(!amount || isLoading || isWaiting) ? 'opacity-70 cursor-not-allowed' : 'hover:bg-yellow-600'}
+          ${toNetwork === "BNB" ? "bg-yellow-500" : "bg-purple-700"}`
+            }
           >
             {isLoading || isWaiting ? 'Processing...' : 'Approve'}
           </button>
@@ -568,11 +634,12 @@ const BridgeForm = () => {
         {(amount || errorMessage || successMessage || txHash) && (
           <button
             onClick={handleClearForm}
-            className="w-full mt-2 bg-transparent text-gray-600 py-2 rounded-xl font-medium text-xs hover:bg-gray-100 transition-colors"
+            className="w-full mt-2 bg-transparent text-gray-600 py-2 rounded-xl font-medium text-xs hover:bg-[#dae2f8] transition-colors"
           >
             Clear Form
           </button>
         )}
+
 
         <div className="flex justify-between items-center mt-3 text-xs text-gray-500">
           <span>1. Bridge</span>
@@ -582,5 +649,6 @@ const BridgeForm = () => {
     </div>
   );
 };
+
 
 export default BridgeForm;
