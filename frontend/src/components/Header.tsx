@@ -69,14 +69,14 @@ const Header = ({ onMenuToggle }) => {
             <button
               onClick={show}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${isConnected
-                  ? 'hover:bg-gray-50'
+                  ? 'hover:bg-[#dae2f8]'
                   : 'bg-[#d6a4a4] hover:bg-[#c99393] font-medium'
                 }`}
             >
               {isConnected ? (
                 <>
                   <img src={currentNetwork.icon} alt="Wallet" className="w-6 h-6" />
-                  <span className="hidden xs:inline">{ensName || truncatedAddress}</span>
+                  <span className="hidden sm:inline">{ensName || truncatedAddress}</span>
                   <ChevronDown size={18} className="hidden xs:block" />
                 </>
               ) : (
@@ -104,14 +104,14 @@ const Header = ({ onMenuToggle }) => {
         <div className="flex items-center gap-3">
           <div>
             <span className="font-semibold text-base">Moonrise</span>
-            <span className="ml-2 text-xs bg-purple-100 text-gray-700 px-2 py-0.5 rounded-full">Beta</span>
+            <span className="ml-2 text-xs bg-[#dae2f8] text-gray-700 px-2 py-0.5 rounded-full">Beta</span>
           </div>
         </div>
       </div>
       <div className="flex items-center gap-3 md:gap-4">
         <div className="relative" ref={dropdownRef}>
-          <button
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm"
+          {/* <button
+            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#dae2f8] text-sm"
             onClick={toggleNetworkDropdown}
             aria-expanded={networkDropdownOpen}
             aria-haspopup="true"
@@ -120,26 +120,26 @@ const Header = ({ onMenuToggle }) => {
             <span className="hidden sm:inline">{currentNetwork.name}</span>
             <span className="inline sm:hidden">{currentNetwork.shortName}</span>
             <ChevronDown size={18} className={networkDropdownOpen ? "transform rotate-180 transition-transform" : "transition-transform"} />
-          </button>
+          </button> */}
           {networkDropdownOpen && (
-            <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+            <div className="absolute right-0 mt-1 w-56 bg-[#dae2f8] rounded-lg shadow-lg border border-gray-200 py-1 z-50">
               {networks.map((network) => (
                 <button
                   key={network.id}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-gray-50"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-[#dae2f8]"
                   onClick={() => handleSwitchNetwork(network.chainId)}
                 >
                   <img src={network.icon} alt={network.name} className="w-5 h-5" />
                   <span>{network.name}</span>
                   {currentNetwork.id === network.id && (
-                    <span className="ml-auto text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">
+                    <span className="ml-auto text-xs bg-[#dae2f8] text-purple-600 px-2 py-0.5 rounded-full">
                       Active
                     </span>
                   )}
                 </button>
               ))}
               <div className="border-t border-gray-200 my-1"></div>
-              <button className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-sm text-purple-600 hover:bg-gray-50">
+              <button className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-sm text-purple-600 hover:bg-[#dae2f8]">
                 <span>Add custom network</span>
               </button>
             </div>
