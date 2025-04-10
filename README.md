@@ -6,5 +6,5 @@ The system includes smart contracts on both chains, a WebSocket listener for blo
 
 ## Sequence Diagram
 
-![sequence](https://gist.github.com/user-attachments/assets/1078e63e-7328-44ac-b1d8-fcd72fcdfaf6)
+![bridge](https://gist.github.com/user-attachments/assets/1402a650-cea2-4e69-8f65-b8564da73a97)
 ---
