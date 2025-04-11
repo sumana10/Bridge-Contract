@@ -7,7 +7,7 @@ The system includes smart contracts on both chains, a WebSocket listener for blo
 
 ## Sequence Diagram
 
-<img width="1427" alt="Uml Sequence" src="https://gist.github.com/user-attachments/assets/4c619a01-5c2f-4b57-b461-714c72e0317e" />
+<img width="1427" alt="Uml Sequence" src="https://jad7ulghye.ufs.sh/f/hb6AeldjPrMw3xSXWjIIHdJleTQU4jSfurMW7CxbzK6tPhRA" />
 
 
 ## Technical Implementation
