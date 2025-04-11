@@ -60,7 +60,7 @@ const TransactionsList = () => {
   useEffect(() => {
     fetchTransactions();
 
-    const intervalId = setInterval(fetchTransactions, 15000); 
+    const intervalId = setInterval(fetchTransactions, 15000);
 
     return () => clearInterval(intervalId);
   }, [address, isConnected, publicClient]);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { addTransaction, updateTransaction } from "../utils/transactionManager";
-import { ChevronDown, HelpCircle, ArrowDown, CheckCircle } from 'lucide-react';
+import { HelpCircle, ArrowDown, CheckCircle } from 'lucide-react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
 import { BNB_BRIDGE, BNB_TOKEN, BRIDGE_ABI, BRIDGE_ABI_AMOY, AMOY_BRIDGE, AMOY_TOKEN, TOKEN_ABI, TOKEN_ABI_AMOY } from "../utils/constants";
@@ -10,7 +10,6 @@ interface TokenBalance {
   balance: string;
   symbol: string;
 }
-
 
 const BridgeForm = () => {
   const [amount, setAmount] = useState<string>('0.1');
@@ -166,10 +165,7 @@ const BridgeForm = () => {
     try {
       const amountBigInt = parseUnits(amount.toString(), 18);
 
-
       setIsAllowanceSufficient(allowance >= amountBigInt);
-
-
       console.log("Allowance check:", {
         allowance: formatUnits(allowance, 18),
         amount: amount,
@@ -185,7 +181,6 @@ const BridgeForm = () => {
   useEffect(() => {
     setWalletConnected(isConnected);
 
-
     if (isConnected) {
       console.log("Wallet connected:", address);
     } else {
@@ -200,8 +195,6 @@ const BridgeForm = () => {
     if (isConfirmed && txReceipt) {
       console.log("Transaction confirmed:", txReceipt);
 
-
-
       if (txHash) {
         const status = txReceipt.status === 'success' ? 'completed' : 'failed';
         updateTransaction(txHash, {
@@ -211,15 +204,12 @@ const BridgeForm = () => {
         });
       }
 
-
       refetch();
       refetchBalance();
-
 
       if (txReceipt.status === 'success') {
         const actionType = isAllowanceSufficient ? 'Bridge' : 'Approval';
         setSuccessMessage(`${actionType} transaction successful! Your transaction has been confirmed.`);
-
 
         if (isAllowanceSufficient) {
           setAmount('');
@@ -227,14 +217,11 @@ const BridgeForm = () => {
         }
       }
 
-
       setIsLoading(false);
-
 
       const timer = setTimeout(() => {
         setSuccessMessage('');
       }, 10000);
-
 
       return () => clearTimeout(timer);
     }
@@ -247,24 +234,20 @@ const BridgeForm = () => {
       return false;
     }
 
-
     if (!amount || Number(amount) <= 0) {
       alert("Please enter a valid amount");
       return false;
     }
-
 
     if (!tokenAddress || !spenderAddress) {
       alert("Contract addresses not properly configured");
       return false;
     }
 
-
     if (isWhitelisted === false) {
       setErrorMessage(`Token ${tokenAddress} is not whitelisted for bridging`);
       return false;
     }
-
 
     if (minAmount) {
       const amountBigInt = parseUnits(amount.toString(), 18);
@@ -274,7 +257,6 @@ const BridgeForm = () => {
       }
     }
 
-
     if (maxAmount && maxAmount > 0n) {
       const amountBigInt = parseUnits(amount.toString(), 18);
       if (amountBigInt > maxAmount) {
@@ -283,7 +265,6 @@ const BridgeForm = () => {
       }
     }
 
-
     return true;
   };
 
@@ -291,19 +272,15 @@ const BridgeForm = () => {
   const approve = async () => {
     if (!validateInputs()) return;
 
-
     setIsLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
     setTxHash('');
 
-
     try {
       const approveAmount = parseUnits(amount.toString(), 18);
 
-
       console.log(`Approving ${amount} tokens from ${tokenAddress} to ${spenderAddress}`);
-
 
       const hash = await writeContractAsync({
         address: tokenAddress,
@@ -312,10 +289,8 @@ const BridgeForm = () => {
         args: [spenderAddress, approveAmount],
       });
 
-
       setTxHash(hash);
       console.log("Approval transaction submitted:", hash);
-
 
       addTransaction({
         hash: hash,
@@ -326,7 +301,6 @@ const BridgeForm = () => {
         chainId: chainId,
         userAddress: address
       });
-
 
     } catch (error) {
       console.error("Approval error:", error);
@@ -339,23 +313,18 @@ const BridgeForm = () => {
   const handleSwap = async () => {
     if (!validateInputs() || !isAllowanceSufficient) return;
 
-
     setIsLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
     setTxHash('');
 
-
     try {
       const bridgeAmount = parseUnits(amount.toString(), 18);
-
 
       console.log(`Bridging ${amount} tokens from ${fromNetwork} to ${toNetwork}`);
       console.log(`Token: ${tokenAddress}, Bridge: ${spenderAddress}`);
 
-
       const gasLimit = chainId === 80002 ? BigInt(1000000) : BigInt(500000);
-
 
       const hash = await writeContractAsync({
         address: spenderAddress,
@@ -368,7 +337,6 @@ const BridgeForm = () => {
 
       setTxHash(hash);
       console.log("Bridge transaction submitted:", hash);
-
 
       addTransaction({
         hash: hash,
@@ -386,9 +354,7 @@ const BridgeForm = () => {
     } catch (error) {
       console.error("Bridge error:", error);
 
-
       const errorString = String(error);
-
 
       if (errorString.includes("Token_Not_Whitelisted")) {
         setErrorMessage("This token is not whitelisted for bridging");
@@ -529,7 +495,6 @@ const BridgeForm = () => {
           </div>
         )}
 
-
         {isConnected && (
           <div className="p-3 bg-[#d6a4a4]/50 rounded-lg text-xs mb-4 border border-gray-300">
             <div className="flex flex-col gap-1">
@@ -560,7 +525,6 @@ const BridgeForm = () => {
             </div>
           </div>
         )}
-
 
         <div className="flex-1 min-h-[15px]"></div>
         <div className="space-y-2 mb-4">

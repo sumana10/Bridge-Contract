@@ -23,8 +23,7 @@ export const Web3Provider = ({
         <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
                 <ConnectKitProvider customTheme={{
-                    "--ck-body-background":
-                        `#d6a4a4`,
+                    "--ck-body-background": `#d6a4a4`,
                     "--ck-body-color": "#323232",
                     "--ck-body-color-muted": "#323232",
                     "--ck-primary-button-background": `#dae2f8`,

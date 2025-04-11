@@ -32,9 +32,9 @@ const Sidebar = ({ onClose }: any) => {
           return (
             <button
               onClick={(e) => {
-                e.stopPropagation(); 
+                e.stopPropagation();
                 show();
-                handleItemClick(0); 
+                handleItemClick(0);
               }}
               className="text-sm w-full text-left"
             >
@@ -61,9 +61,8 @@ const Sidebar = ({ onClose }: any) => {
         {menuItems.map((item, index) => (
           <div
             key={index}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg cursor-pointer ${
-              item.active ? 'bg-[#dae2f8] text-gray-700' : 'text-gray-700 hover:bg-[#dae2f8]'
-            }`}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg cursor-pointer ${item.active ? 'bg-[#dae2f8] text-gray-700' : 'text-gray-700 hover:bg-[#dae2f8]'
+              }`}
             onClick={() => handleItemClick(index)}
           >
             <item.icon size={20} className="flex-shrink-0" />

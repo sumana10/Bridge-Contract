@@ -12,7 +12,7 @@ const Header = ({ onMenuToggle }) => {
   const chainId = useChainId();
 
   const getCurrentNetworkInfo = () => {
-    if (!chainId) return networks[0]; 
+    if (!chainId) return networks[0];
 
     if (chainId === 97) {
       return networks[1]; // BNB Testnet
@@ -24,7 +24,7 @@ const Header = ({ onMenuToggle }) => {
       id: chainId.toString(),
       name: `Chain ID: ${chainId}`,
       shortName: `Chain ${chainId}`,
-      icon: './poly.png' 
+      icon: './poly.png'
     };
   };
 
@@ -69,8 +69,8 @@ const Header = ({ onMenuToggle }) => {
             <button
               onClick={show}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${isConnected
-                  ? 'hover:bg-[#dae2f8]'
-                  : 'bg-[#d6a4a4] hover:bg-[#c99393] font-medium'
+                ? 'hover:bg-[#dae2f8]'
+                : 'bg-[#d6a4a4] hover:bg-[#c99393] font-medium'
                 }`}
             >
               {isConnected ? (
