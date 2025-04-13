@@ -31,6 +31,7 @@ contract BridgeContract is Ownable {
     mapping(IERC20 => uint256) public maxAmounts;
     mapping(IERC20 => uint256) public minAmounts;
     
+
     constructor() Ownable(_msgSender()) {}
 
     /**
@@ -40,14 +41,14 @@ contract BridgeContract is Ownable {
      */
     function bridge(IERC20 _tokenAddress, uint256 _amount) public {
         // Validate token and amount
-        if (!whitelistedTokens[_tokenAddress]) revert BridgeContract__Token_Not_Whitelisted();
-        if (_amount > maxAmounts[_tokenAddress] && maxAmounts[_tokenAddress] > 0) 
-            revert BridgeContract__Amount_Too_Large();
-        if (_amount < minAmounts[_tokenAddress] && minAmounts[_tokenAddress] > 0) 
+        if (!whitelistedTokens[_tokenAddress]) revert BridgeContract__Token_Not_Whitelisted(); 
+        if (_amount > maxAmounts[_tokenAddress] && maxAmounts[_tokenAddress] > 0)
+            revert BridgeContract__Amount_Too_Large(); 
+        if (_amount < minAmounts[_tokenAddress] && minAmounts[_tokenAddress] > 0)
             revert BridgeContract__Amount_Too_Small();
         
         // Check allowance
-        if (_tokenAddress.allowance(_msgSender(), address(this)) < _amount) 
+        if (_tokenAddress.allowance(_msgSender(), address(this)) < _amount)
             revert BridgeContract__Insufficient_Allowance();
         
         // Transfer tokens from sender to bridge
@@ -91,21 +92,21 @@ contract BridgeContract is Ownable {
      * @param _tokenAddress The token address to whitelist
      * @param _status Whether the token should be whitelisted
      */
-    function setTokenWhitelist(IERC20 _tokenAddress, bool _status) external onlyOwner {
+  function setTokenWhitelist(IERC20 _tokenAddress, bool _status) external onlyOwner {
         whitelistedTokens[_tokenAddress] = _status;
         emit TokenWhitelisted(_tokenAddress, _status);
     }
-
     /**
      * @dev Sets the maximum amount that can be bridged for a token.
      * @param _tokenAddress The token address
      * @param _maxAmount The maximum amount
      */
+ 
     function setMaxAmount(IERC20 _tokenAddress, uint256 _maxAmount) external onlyOwner {
         maxAmounts[_tokenAddress] = _maxAmount;
         emit MaxAmountUpdated(_tokenAddress, _maxAmount);
-    }
 
+    }
     /**
      * @dev Sets the minimum amount that can be bridged for a token.
      * @param _tokenAddress The token address

@@ -7,6 +7,8 @@ import { PrismaClient } from "@prisma/client";
 dotenv.config();
 const prisma = new PrismaClient();
 
+// Middleware to log Prisma query duration
+
 prisma.$use(async (params, next) => {
   const before = Date.now();
   const result = await next(params);
@@ -15,15 +17,25 @@ prisma.$use(async (params, next) => {
   return result;
 });
 
+// Maintains active blockchain providers for each network
+
 let activeProviders = {
   BNB: null as WebSocketProvider | JsonRpcProvider | null,
   Amoy: null as WebSocketProvider | JsonRpcProvider | null
 };
 
+// Maintains active contract instances for each network
+
 let activeContracts = {
   BNB: null as Contract | null,
   Amoy: null as Contract | null
 };
+
+/**
+ * Creates a new WebSocket or HTTP provider for a given network
+ * Reconnects automatically if WebSocket closes
+ * Also sets up the contract instance
+ */
 
 const createProvider = (url: string, networkName: "BNB" | "Amoy") => {
   try {
@@ -94,11 +106,16 @@ const createProvider = (url: string, networkName: "BNB" | "Amoy") => {
   }
 };
 
+// Initialize providers for both BNB and Amoy networks
+
 const providerBNB = createProvider(process.env.BNB_RPC!, "BNB");
 const providerAMOY = createProvider(process.env.AMOY_RPC!, "Amoy");
 
 console.log(`BNB Bridge Contract: ${process.env.BNB_BRIDGE}`);
 console.log(`Amoy Bridge Contract: ${process.env.AMOY_BRIDGE}`);
+
+// Redis queue setup for processing bridge jobs
+
 
 const redisConfig = {
   redis: {
@@ -109,6 +126,8 @@ const redisConfig = {
 };
 
 const bridgeQueue = new Bull("bridgeQueue", redisConfig);
+
+// Event listeners for queue lifecycle logging
 
 bridgeQueue.on('completed', job => {
   console.log(`Job ${job.id} completed for tx: ${job.data.txhash}`);
@@ -122,10 +141,16 @@ bridgeQueue.on('error', err => {
   console.error('Bull queue error:', err);
 });
 
+// Stores the currently active on-chain event listeners
+
 let activeListeners = {
   BNB: null as ((tokenAddress, amount, sender, event) => void) | null,
   Amoy: null as ((tokenAddress, amount, sender, event) => void) | null
 };
+
+/**
+ * Ensures provider is alive; if not, reinitializes it
+ */
 
 const ensureProviderConnection = async (networkName: "BNB" | "Amoy") => {
   const provider = activeProviders[networkName];
@@ -146,6 +171,11 @@ const ensureProviderConnection = async (networkName: "BNB" | "Amoy") => {
     return false;
   }
 };
+
+/**
+ * Listens for new and past 'Bridge' events on a network
+ * Syncs missed logs and sets up real-time listeners
+ */
 
 const listenToBridgeEvents = async (network: "BNB" | "Amoy") => {
   try {
@@ -278,6 +308,11 @@ const listenToBridgeEvents = async (network: "BNB" | "Amoy") => {
     console.error(`Error in ${network} listener:`, error);
   }
 };
+
+/**
+ * Transfers tokens by interacting with the bridge contract
+ * Uses WebSocket or HTTP fallback for transaction signing
+ */
 
 const transferToken = async (
   isBNB: boolean,

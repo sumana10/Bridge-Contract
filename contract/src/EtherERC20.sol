@@ -5,6 +5,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EtherERC20 is ERC20, Ownable {
+
     bool public failTransfers;
     uint8 private constant _decimals = 18;
 
@@ -26,6 +27,7 @@ contract EtherERC20 is ERC20, Ownable {
      * Useful for testing error handling in the bridge contract.
      * @param _fail Whether transfers should fail
      */
+   
     function setFailTransfers(bool _fail) external onlyOwner {
         failTransfers = _fail;
     }
@@ -38,7 +40,6 @@ contract EtherERC20 is ERC20, Ownable {
     function mint(address to, uint256 amount) external onlyOwner {
         _mint(to, amount);
     }
-
     /**
      * @dev Allows token holders to burn their tokens.
      * @param amount Amount of tokens to burn
@@ -46,12 +47,12 @@ contract EtherERC20 is ERC20, Ownable {
     function burn(uint256 amount) external {
         _burn(msg.sender, amount);
     }
-
     /**
      * @dev Allows burning tokens from an account with allowance.
      * @param account Address to burn tokens from
      * @param amount Amount of tokens to burn
      */
+
     function burnFrom(address account, uint256 amount) external {
         uint256 currentAllowance = allowance(account, msg.sender);
         require(currentAllowance >= amount, "ERC20: burn amount exceeds allowance");
