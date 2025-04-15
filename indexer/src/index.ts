@@ -9,13 +9,13 @@ const prisma = new PrismaClient();
 
 // Middleware to log Prisma query duration
 
-prisma.$use(async (params, next) => {
-  const before = Date.now();
-  const result = await next(params);
-  const after = Date.now();
-  console.log(`Prisma Query: ${params.model}.${params.action} took ${after - before}ms`);
-  return result;
-})
+// prisma.$use(async (params, next) => {
+//   const before = Date.now();
+//   const result = await next(params);
+//   const after = Date.now();
+//   console.log(`Prisma Query: ${params.model}.${params.action} took ${after - before}ms`);
+//   return result;
+// })
 
 // Maintains active blockchain providers for each network
 
@@ -38,8 +38,8 @@ let activeContracts = {
  */
 
 const createProvider = (url: string, networkName: "BNB" | "Amoy") => {
-  try {
 
+  try {
     console.log(`Creating new connection for ${networkName}...`);
 
     if (activeProviders[networkName]) {
@@ -55,6 +55,7 @@ const createProvider = (url: string, networkName: "BNB" | "Amoy") => {
     if (url.startsWith('ws')) {
 
       try {
+    
         provider = new WebSocketProvider(url);
 
         provider.websocket.onclose = () => {
@@ -63,9 +64,9 @@ const createProvider = (url: string, networkName: "BNB" | "Amoy") => {
 
           if (activeProviders[networkName] === provider) {
             activeProviders[networkName] = null;
-          }
+          }          
 
-          setTimeout(() => {
+          setTimeout(() =>{
             if (!activeProviders[networkName]) {
               createProvider(url, networkName);
               initializeListeners();
@@ -113,11 +114,11 @@ const createProvider = (url: string, networkName: "BNB" | "Amoy") => {
 
 // Initialize providers for both BNB and Amoy networks
 
-const providerBNB = createProvider(process.env.BNB_RPC!, "BNB");
-const providerAMOY = createProvider(process.env.AMOY_RPC!, "Amoy");
+// const providerBNB = createProvider(process.env.BNB_RPC!, "BNB");
+// const providerAMOY = createProvider(process.env.AMOY_RPC!, "Amoy");
 
-console.log(`BNB Bridge Contract: ${process.env.BNB_BRIDGE}`);
-console.log(`Amoy Bridge Contract: ${process.env.AMOY_BRIDGE}`);
+// console.log(`BNB Bridge Contract: ${process.env.BNB_BRIDGE}`);
+// console.log(`Amoy Bridge Contract: ${process.env.AMOY_BRIDGE}`);
 
 // Redis queue setup for processing bridge jobs
 
@@ -134,17 +135,17 @@ const bridgeQueue = new Bull("bridgeQueue", redisConfig);
 
 // Event listeners for queue lifecycle logging
 
-bridgeQueue.on('completed', job => {
-  console.log(`Job ${job.id} completed for tx: ${job.data.txhash}`);
-})
+// bridgeQueue.on('completed', job => {
+//   console.log(`Job ${job.id} completed for tx: ${job.data.txhash}`);
+// })
 
-bridgeQueue.on('failed', (job, err) => {
-  console.error(`Job ${job.id} failed for tx: ${job.data.txhash}`, err);
-})
+// bridgeQueue.on('failed', (job, err) => {
+//   console.error(`Job ${job.id} failed for tx: ${job.data.txhash}`, err);
+// })
 
-bridgeQueue.on('error', err => {
-  console.error("Bull queue error:", err);
-})
+// bridgeQueue.on('error', err => {
+//   console.error("Bull queue error:", err);
+// })
 
 // Stores the currently active on-chain event listeners
 
@@ -155,6 +156,7 @@ let activeListeners = {
 /**
  * Ensures provider is alive; if not, reinitializes it
  */
+
 
 const ensureProviderConnection = async (networkName: "BNB" | "Amoy") => {
 
@@ -183,9 +185,9 @@ const ensureProviderConnection = async (networkName: "BNB" | "Amoy") => {
 
 const listenToBridgeEvents = async (network: "BNB" | "Amoy") => {
   try {
+  
     const provider = activeProviders[network];
     const contract = activeContracts[network];
-
 
     if (!provider || !contract) {
       console.error(`No provider or contract for ${network}`);
@@ -195,10 +197,11 @@ const listenToBridgeEvents = async (network: "BNB" | "Amoy") => {
     console.log(`Setting up listener for ${network} on contract ${contract.target}`);
 
     let lastProcessedBlock = await prisma.networkStatus.findUnique({
-      where: { network },
-    })
+      where : { network }
+    });
 
     const latestBlock = await provider.getBlockNumber();
+  
     console.log(`Current block for ${network}: ${latestBlock}`);
 
     if (!lastProcessedBlock) {
@@ -565,17 +568,17 @@ bridgeQueue.process(async (job) => {
 // It is useful for checking if any bridge events were missed and need to be processed.
 // Any errors during the manual check are caught and logged.
 
-const checkForNewEvents = async () => {
-  console.log("Manually checking for new events on both networks...");
-  try {
-    await listenToBridgeEvents("BNB");
-    await listenToBridgeEvents("Amoy");
-  } catch (error) {
-    console.error("Error during manual event check:", error);
-  }
-}
+// const checkForNewEvents = async () => {
+//   console.log("Manually checking for new events on both networks...");
+//   try {
+//     await listenToBridgeEvents("BNB");
+//     await listenToBridgeEvents("Amoy");
+//   } catch (error) {
+//     console.error("Error during manual event check:", error);
+//   }
+// }
 
-setInterval(checkForNewEvents, 120000);
+// setInterval(checkForNewEvents, 120000);
 
 // This immediately invoked async function tests the database connection by querying records from the `networkStatus`, `transactionData`, and `nonce` tables. If the connection fails, it logs the error and exits the process.
 
