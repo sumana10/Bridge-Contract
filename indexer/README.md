@@ -2,12 +2,12 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        Application Initialization                        │
+│                        Application Initialization                       │
 └───────────────────────────────────┬─────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        Database Connection Test                          │
+│                        Database Connection Test                         │
 │                                                                         │
 │  • Query networkStatus, transactionData, and nonce tables               │
 │  • Exit process if connection fails                                     │
@@ -15,7 +15,7 @@
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                     Initialize Blockchain Providers                      │
+│                     Initialize Blockchain Providers                     │
 │                                                                         │
 │  • Create WebSocket or HTTP providers for BNB and Amoy networks         │
 │  • Set up contract instances with ABI                                   │
@@ -24,7 +24,7 @@
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                      Initialize Event Listeners                          │
+│                      Initialize Event Listeners                         │
 │                                                                         │
 │  • Call listenToBridgeEvents() for both networks                        │
 │  • Set up event handlers for "Bridge" events                            │
@@ -32,8 +32,8 @@
                                     │
                                     ▼
                  ┌─────────────────────────────────────┐
-                 │         Continuous Monitoring        │
-                 └──────────┬─────────────┬─────────────┘
+                 │         Continuous Monitoring       │
+                 └──────────┬─────────────┬────────────┘
                             │             │
         ┌───────────────────┘             └────────────────┐
         ▼                                                  ▼
@@ -53,12 +53,12 @@
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         Event Processing Flow                            │
+│                         Event Processing Flow                           │
 └───────────────────────────────────┬─────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                       listenToBridgeEvents Function                      │
+│                       listenToBridgeEvents Function                     │
 │                                                                         │
 │  1. Get last processed block from database                              │
 │  2. Get current block from blockchain                                   │
@@ -70,7 +70,7 @@
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                          Bridge Event Detected                           │
+│                          Bridge Event Detected                          │
 │                                                                         │
 │  • Extract token address, amount, sender from event                     │
 │  • Add job to Bull queue                                                │
@@ -79,7 +79,7 @@
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           Job Queue Processing                           │
+│                           Job Queue Processing                          │
 │                                                                         │
 │  1. Check if transaction exists in database                             │
 │  2. If new, get unique nonce and create transaction record              │
@@ -90,7 +90,7 @@
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                            Token Transfer                                │
+│                            Token Transfer                               │
 │                                                                         │
 │  1. Create provider for target network                                  │
 │  2. Create wallet with private key                                      │
@@ -99,7 +99,7 @@
 └─────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         Error Handling & Cleanup                         │
+│                         Error Handling & Cleanup                        │
 └───────────────────────────────────┬─────────────────────────────────────┘
                                     │
                  ┌─────────────────────────────────────┐
